@@ -1,0 +1,58 @@
+version: '3.9'
+#db listens on 5432
+
+services:
+  db:
+    image: postgres
+    container_name: postgres
+    ports:
+      - 5432:5432
+    restart: unless-stopped
+    volumes:
+       - data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=hohoho
+    #command: bash -c "chmod 777 /var/lib/postgresql/data && "
+    networks:
+      - lala
+
+  backend:
+    image: node:lts-alpine
+    container_name: backend
+    working_dir: /backend
+    volumes:
+      - ./nestjs/srcs:/backend
+    ports:
+      - 3000:3000
+      - 5555:5555
+    command: sh -c "npm run start:dev"
+    # command: tail -f /dev/null
+  #apk add --update nodejs npm && apk add --update npm &&
+    restart: unless-stopped
+    networks:
+      - lala
+  
+  frontend:
+    image: node:lts-alpine
+    container_name: frontend
+    working_dir: /frontend
+    volumes:
+      - ./react/srcs:/frontend
+    ports:
+      - 9999:9999
+    # command: tail -f /dev/null
+    command: sh -c "npm start"
+    restart: unless-stopped
+    #apk add --update nodejs npm && apk add --update npm &&
+    networks:
+      - lala
+
+volumes:
+  data:
+    # driver_opts:
+    #   type: none
+    #   device: /mnt/nfs/homes/rkhelif/sgoinfre/trance/dbe
+    #   o: bind
+
+networks:
+  lala:
